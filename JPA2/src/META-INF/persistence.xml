@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="JPA">
+	<class>model.Banda</class>
+		<class>model.Filamento</class>
+		<class>model.Poscontorno</class>
+		<class>model.PoscontornoPK</class>
+		<class>model.Posscheletro</class>
+		<class>model.PosscheletroPK</class>
+		<class>model.Satellite</class>
+		<class>model.Scheletro</class>
+		<class>model.Stella</class>
+		<class>model.Strumento</class>
+		<class>model.StrumentoPK</class>
+		<class>model.Utente</class>
+		<properties>
+			<property name="javax.persistence.jdbc.driver"
+				value="org.postgresql.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:postgresql://localhost/ProgettoDB" />
+			<property name="javax.persistence.jdbc.user"
+				value="postgres" />
+			<property name="javax.persistence.jdbc.password"
+				value="postgres" />
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hbm2ddl.auto" value="create" />
+		</properties>
+	</persistence-unit>
+</persistence>
