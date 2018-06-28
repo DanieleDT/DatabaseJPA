@@ -23,7 +23,8 @@ public class Banda implements Serializable {
 		@JoinColumn(name="nomestrumento", referencedColumnName="satellite")
 		})
 	private Strumento strumento;
-
+	
+	
 	public Banda() {
 	}
 
