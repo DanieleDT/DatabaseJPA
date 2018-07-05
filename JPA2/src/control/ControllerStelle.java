@@ -8,10 +8,13 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+import bean.BeanStella;
 import bean.BeanStelleInFilamento;
 import model.Stella;
 import model.Filamento;
 import model.Poscontorno;
+import model.Posscheletro;
+import model.Scheletro;
 
 public class ControllerStelle {
 	// RF9
@@ -60,14 +63,16 @@ public class ControllerStelle {
 	}
 
 	// RF 10 (da ottimizzare tempi lunghi)
-	public ArrayList<BeanStelleInFilamento> StelleInFilRettangolo(double latCentro, double lonCentro, double base, double altezza) {
-		//prima stelle nei filamenti, poi non;
+	public ArrayList<BeanStelleInFilamento> StelleInFilRettangolo(double latCentro, double lonCentro, double base,
+			double altezza) {
+		// prima stelle nei filamenti, poi non;
 		ArrayList<Stella> stelle = LoadStelleInRettangolo(latCentro, lonCentro, base, altezza);
 		ArrayList<Stella> stelleInFil = new ArrayList<>();
 		ArrayList<Stella> stelleNotInFil = new ArrayList<>();
-		ArrayList<Filamento> filamentiInRettangolo = ControllerFilamento.ricercaFilementiRettangolo(latCentro, lonCentro, base, altezza);
+		ArrayList<Filamento> filamentiInRettangolo = ControllerFilamento.ricercaFilementiRettangolo(latCentro,
+				lonCentro, base, altezza);
 		for (int i = 0; i <= filamentiInRettangolo.size() - 1; i++) {
-			List<Poscontorno>contorno = filamentiInRettangolo.get(i).getPoscontornos();
+			List<Poscontorno> contorno = filamentiInRettangolo.get(i).getPoscontornos();
 			for (int j = 0; j <= stelle.size() - 1; j++) {
 				int sum = 0;
 				for (int k = 0; k <= contorno.size() - 2; k++) {
@@ -106,7 +111,7 @@ public class ControllerStelle {
 		}
 		BeanStelleInFilamento beanStelleInFil = new BeanStelleInFilamento(stelleInFil, countProtostelle, countPrestelle,
 				countUnbound);
-		
+
 		int countProtostelle1 = 0;
 		int countPrestelle1 = 0;
 		int countUnbound1 = 0;
@@ -119,11 +124,53 @@ public class ControllerStelle {
 				countProtostelle++;
 			}
 		}
-		BeanStelleInFilamento beanStelleNotInFil = new BeanStelleInFilamento(stelleNotInFil, countProtostelle1, countPrestelle1,
-				countUnbound1);
+		BeanStelleInFilamento beanStelleNotInFil = new BeanStelleInFilamento(stelleNotInFil, countProtostelle1,
+				countPrestelle1, countUnbound1);
 		ArrayList<BeanStelleInFilamento> result = new ArrayList<>();
-		result.add(0,beanStelleInFil);
-		result.add(1,beanStelleNotInFil);
+		result.add(0, beanStelleInFil);
+		result.add(1, beanStelleNotInFil);
+		return result;
+	}
+
+	//RF 12
+	public ArrayList<BeanStella> distanzaStelleSpinaDorsale(int idFil) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		ArrayList<Stella> stelle = FindStelleInFilamento(idFil).getStelle();
+		TypedQuery<Filamento> queryShowAll = em.createQuery("SELECT p FROM filamento p WHERE p.id = " + (idFil),
+				model.Filamento.class);
+		Filamento filamento = queryShowAll.getSingleResult();
+		ArrayList<Posscheletro> posScheletro = new ArrayList<>();
+		BeanStella beanStella;
+		List<Scheletro> scheletro = filamento.getScheletros();
+		ArrayList<BeanStella> result = new ArrayList<>();
+		for (int k = 0; k < scheletro.size(); k++) {
+			List<Posscheletro> posScheletros = scheletro.get(k).getPosscheletros();
+			if (scheletro.get(k).getTipo()) {
+				// se il ramo fa parte della spina dorsale, allora aggiunge tutti i suoi punti
+				// alla lista
+				for (int h = 0; h < posScheletros.size(); h++) {
+					posScheletro.add(posScheletros.get(h));
+				}
+			}
+			
+		}
+
+		for (int i = 0; i < stelle.size(); i++) {
+			double dist = Integer.MAX_VALUE;
+			for (int j = 0; j < posScheletro.size(); j++) {
+				double distanza = Math.sqrt(Math
+						.pow((stelle.get(i).getLatitudine() - posScheletro.get(j).getId().getLatitudine()), 2.0)
+						+ Math.pow((stelle.get(i).getLongitudine() - posScheletro.get(j).getId().getLongitudine()),
+								2.0));
+				if (distanza < dist) {
+					dist = distanza;
+				}
+			}
+			beanStella = new BeanStella(stelle.get(i).getId(), stelle.get(i).getValoreflusso(), dist,
+					stelle.get(i).getNome());
+			result.add(beanStella);
+		}
 		return result;
 	}
 
@@ -182,8 +229,7 @@ public class ControllerStelle {
 		}
 		for (int i = 0; i < stelle.size(); i++) {
 			Stella stella = stelle.get(i);
-			if (stella.getLongitudine() <= (lonCentro + semibase) 
-					&& stella.getLongitudine() >= (lonCentro - semibase)
+			if (stella.getLongitudine() <= (lonCentro + semibase) && stella.getLongitudine() >= (lonCentro - semibase)
 					&& stella.getLatitudine() >= (latCentro - semialtezza)
 					&& stella.getLatitudine() <= (latCentro + semialtezza)) {
 				result.add(stella);
