@@ -15,6 +15,7 @@ import javax.persistence.Persistence;
 import model.Filamento;
 import model.Poscontorno;
 import model.PoscontornoPK;
+import model.Satellite;
 import model.Stella;
 
 public class CsvManager {
@@ -45,7 +46,7 @@ public class CsvManager {
 		case 0:
 			insertContorni(bufferedReader, em);
 		case 1:
-			//insertFilamenti(bufferedReader, em);
+			insertFilamenti(bufferedReader, em);
 		case 2:
 			//insertScheletro(bufferedReader, em);
 		case 3:
@@ -124,6 +125,38 @@ public class CsvManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	private void insertFilamenti(BufferedReader bufRead, EntityManager em) {
+		String line;
+		try {
+			while ((line = bufRead.readLine()) != null) {
+				String[] linePart = line.split(",");
+				int ID = Integer.parseInt(linePart[0].trim());
+				String nome = linePart[1].trim();
+				double flusso = Double.parseDouble(linePart[2].trim());
+				double densita = Double.parseDouble(linePart[3].trim());
+				double temperatura = Double.parseDouble(linePart[4].trim());
+				double ellitticita = Double.parseDouble(linePart[5].trim());
+				double contrasto = Double.parseDouble(linePart[6].trim());
+				String satellite = linePart[7].trim();
+				String strumento = linePart[8].trim();
+				Filamento filamento = em.find(Filamento.class, ID);
+				if (filamento != null) {
+					Filamento fil = new Filamento();
+					fil.setId(ID);
+					fil.setNome(nome);
+					fil.setFlussototale(flusso);
+					fil.setDensitamedia(densita);
+					fil.setTempmedia(temperatura);
+					fil.setEllitticita(ellitticita);
+					fil.setContrasto(contrasto);
+					Satellite sat = em.find(Satellite.class, satellite);
+					fil.setStrumento(strumento);
+					
+					em.getTransaction().commit();
+					
+					
+				
 	}
 
 }
