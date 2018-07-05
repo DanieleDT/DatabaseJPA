@@ -17,6 +17,7 @@ import model.Poscontorno;
 import model.PoscontornoPK;
 import model.Satellite;
 import model.Stella;
+import model.Strumento;
 
 public class CsvManager {
 	String path;
@@ -151,7 +152,9 @@ public class CsvManager {
 					fil.setEllitticita(ellitticita);
 					fil.setContrasto(contrasto);
 					Satellite sat = em.find(Satellite.class, satellite);
-					fil.setStrumento(strumento);
+					fil.setSatellite(sat);
+					Strumento strum = em.find(Strumento.class, strumento);
+					fil.setStrumento(strum);
 					
 					em.getTransaction().commit();
 					
