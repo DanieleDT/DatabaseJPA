@@ -15,8 +15,8 @@ public class TestMain {
 
 	public static void main(String[] args) {
 		ControllerStelle con = new ControllerStelle();
-		BeanStelleInFilamento bean = con.FindStelleInFilamento(666);
-		System.out.println(bean.getStelle().size());
+		ArrayList<BeanStelleInFilamento> bean = con.StelleInFilRettangolo(0,0, 10000, 10000);
+		System.out.println(bean.get(0).getStelle().size());
 		System.out.println("END");
 	}
 }

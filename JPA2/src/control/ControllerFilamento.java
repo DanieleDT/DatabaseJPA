@@ -273,4 +273,36 @@ public class ControllerFilamento {
 		result.add(1, (maxLon - minLon));
 		return result;
 	}
+	
+	public static ArrayList<Filamento> ricercaFilementiRettangolo(double latCentro, double lonCentro, double base, double altezza) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		ArrayList<Filamento> fil = new ArrayList<Filamento>();
+		ArrayList<Filamento> result = new ArrayList<Filamento>();
+		double semibase = base / 2;
+		double semialtezza = altezza /2;
+		List<Filamento> totale = em.createNamedQuery("Filamento.findAll").getResultList();
+		for (Filamento c : totale) {
+
+			fil.add(c);
+		}
+		for (int i = 0; i < fil.size(); i++) {
+			Filamento f = fil.get(i);
+			List<Poscontorno> contorno = f.getPoscontornos();
+			for (int j = 0; j < contorno.size(); j++) {
+				double latitudine = contorno.get(j).getId().getLatitudine();
+				double longitudine = contorno.get(j).getId().getLongitudine();
+				if ((latitudine <= (latCentro + semialtezza) 
+						&& latitudine >= (latCentro - semialtezza)
+						&& longitudine <= (lonCentro + semibase) 
+						&& longitudine >= (lonCentro - semibase))) {
+					result.add(f);
+					break;
+				}
+			}
+		}
+		em.close();
+		emf.close();
+		return result;
+	}
 }
