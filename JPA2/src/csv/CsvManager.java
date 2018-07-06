@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-
 import model.Filamento;
 import model.Poscontorno;
 import model.PoscontornoPK;
@@ -49,7 +48,7 @@ public class CsvManager {
 		case 1:
 			insertFilamenti(bufferedReader, em);
 		case 2:
-			//insertScheletro(bufferedReader, em);
+			// insertScheletro(bufferedReader, em);
 		case 3:
 			insertStelle(bufferedReader, em);
 		}
@@ -127,6 +126,7 @@ public class CsvManager {
 			e.printStackTrace();
 		}
 	}
+
 	private void insertFilamenti(BufferedReader bufRead, EntityManager em) {
 		String line;
 		try {
@@ -155,11 +155,29 @@ public class CsvManager {
 					fil.setSatellite(sat);
 					Strumento strum = em.find(Strumento.class, strumento);
 					fil.setStrumento(strum);
-					
-					em.getTransaction().commit();
-					
-					
-				
-	}
+					em.getTransaction().begin();
+					em.persist(fil);
 
+					em.getTransaction().commit();
+				} else {
+					// esiste-->aggiorno
+					em.getTransaction().begin();
+					filamento.setId(ID);
+					filamento.setNome(nome);
+					filamento.setFlussototale(flusso);
+					filamento.setDensitamedia(densita);
+					filamento.setTempmedia(temperatura);
+					filamento.setEllitticita(ellitticita);
+					filamento.setContrasto(contrasto);
+					Satellite sat = em.find(Satellite.class, satellite);
+					filamento.setSatellite(sat);
+					Strumento strum = em.find(Strumento.class, strumento);
+					filamento.setStrumento(strum);
+					em.getTransaction().commit();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
