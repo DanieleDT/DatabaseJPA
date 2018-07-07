@@ -3,20 +3,19 @@ package csv;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
 import model.Filamento;
 import model.Poscontorno;
 import model.PoscontornoPK;
+import model.Posscheletro;
+import model.PosscheletroPK;
 import model.Satellite;
+import model.Scheletro;
 import model.Stella;
 import model.Strumento;
+import model.StrumentoPK;
 
 public class CsvManager {
 	String path;
@@ -48,7 +47,7 @@ public class CsvManager {
 		case 1:
 			insertFilamenti(bufferedReader, em);
 		case 2:
-			// insertScheletro(bufferedReader, em);
+			insertScheletro(bufferedReader, em);
 		case 3:
 			insertStelle(bufferedReader, em);
 		}
@@ -97,7 +96,7 @@ public class CsvManager {
 				double flusso = Double.parseDouble(linePart[4].trim());
 				String tipologia = linePart[5].trim();
 				Stella stella = em.find(Stella.class, ID);
-				if (stella != null) {
+				if (stella == null) {
 					Stella star = new Stella();
 					star.setId(ID);
 					star.setNome(nome);
@@ -142,7 +141,7 @@ public class CsvManager {
 				String satellite = linePart[7].trim();
 				String strumento = linePart[8].trim();
 				Filamento filamento = em.find(Filamento.class, ID);
-				if (filamento != null) {
+				if (filamento == null) {
 					Filamento fil = new Filamento();
 					fil.setId(ID);
 					fil.setNome(nome);
@@ -153,8 +152,6 @@ public class CsvManager {
 					fil.setContrasto(contrasto);
 					Satellite sat = em.find(Satellite.class, satellite);
 					fil.setSatellite(sat);
-					Strumento strum = em.find(Strumento.class, strumento);
-					fil.setStrumento(strum);
 					em.getTransaction().begin();
 					em.persist(fil);
 
@@ -171,8 +168,6 @@ public class CsvManager {
 					filamento.setContrasto(contrasto);
 					Satellite sat = em.find(Satellite.class, satellite);
 					filamento.setSatellite(sat);
-					Strumento strum = em.find(Strumento.class, strumento);
-					filamento.setStrumento(strum);
 					em.getTransaction().commit();
 				}
 			}
@@ -180,4 +175,62 @@ public class CsvManager {
 			e.printStackTrace();
 		}
 	}
+	
+	public void insertScheletro(BufferedReader bufRead, EntityManager em) {
+		String line;
+		try {
+			while((line = bufRead.readLine())!= null) {
+				String[] linePart = line.split(",");
+				int idFil = Integer.parseInt(linePart[0].trim());
+				int id = Integer.parseInt(linePart[1].trim());
+				String tipo = linePart[2].trim();
+				Boolean tipologia = false;
+				if(tipo.equals("S")) {
+					tipologia = true;
+				}
+				double lon = Double.parseDouble(linePart[3].trim());
+				double lat = Double.parseDouble(linePart[4].trim());
+				int numProg = Integer.parseInt(linePart[5].trim());
+				double flusso = Double.parseDouble(linePart[6].trim());
+				Filamento filamento = em.find(Filamento.class, idFil);
+				if(filamento == null) {
+					//aggiungo lo scheletro (se non esiste)
+					Scheletro scheletro = em.find(Scheletro.class, id);
+					if(scheletro == null){
+						scheletro = new Scheletro();
+						scheletro.setId(id);
+						scheletro.setTipo(tipologia);
+						scheletro.setFilamento(filamento);
+						
+						em.getTransaction().begin();
+						em.persist(scheletro);
+						em.getTransaction().commit();
+					}else {
+						em.getTransaction().begin();
+						scheletro.setId(id);
+						scheletro.setTipo(tipologia);
+						scheletro.setFilamento(filamento);
+					}
+					//aggiungo il punto dello scheletro (se non esiste)
+					PosscheletroPK pk = new PosscheletroPK();
+					pk.setLatitudine(lat);
+					pk.setLongitudine(lon);
+					Posscheletro pos = em.find(Posscheletro.class, pk);
+					if(pos == null) {
+						pos = new Posscheletro();
+						pos.setId(pk);
+						pos.setScheletro(scheletro);
+						pos.setNumeroprogressivo(numProg);
+						pos.setFlusso(flusso);
+						em.getTransaction().begin();
+						em.persist(pos);
+						em.getTransaction().commit();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

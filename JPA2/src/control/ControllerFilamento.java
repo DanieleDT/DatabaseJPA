@@ -273,14 +273,15 @@ public class ControllerFilamento {
 		result.add(1, (maxLon - minLon));
 		return result;
 	}
-	
-	public static ArrayList<Filamento> ricercaFilementiRettangolo(double latCentro, double lonCentro, double base, double altezza) {
+
+	public static ArrayList<Filamento> ricercaFilementiRettangolo(double latCentro, double lonCentro, double base,
+			double altezza) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
 		EntityManager em = emf.createEntityManager();
 		ArrayList<Filamento> fil = new ArrayList<Filamento>();
 		ArrayList<Filamento> result = new ArrayList<Filamento>();
 		double semibase = base / 2;
-		double semialtezza = altezza /2;
+		double semialtezza = altezza / 2;
 		List<Filamento> totale = em.createNamedQuery("Filamento.findAll").getResultList();
 		for (Filamento c : totale) {
 
@@ -292,10 +293,8 @@ public class ControllerFilamento {
 			for (int j = 0; j < contorno.size(); j++) {
 				double latitudine = contorno.get(j).getId().getLatitudine();
 				double longitudine = contorno.get(j).getId().getLongitudine();
-				if ((latitudine <= (latCentro + semialtezza) 
-						&& latitudine >= (latCentro - semialtezza)
-						&& longitudine <= (lonCentro + semibase) 
-						&& longitudine >= (lonCentro - semibase))) {
+				if ((latitudine <= (latCentro + semialtezza) && latitudine >= (latCentro - semialtezza)
+						&& longitudine <= (lonCentro + semibase) && longitudine >= (lonCentro - semibase))) {
 					result.add(f);
 					break;
 				}
@@ -304,5 +303,30 @@ public class ControllerFilamento {
 		em.close();
 		emf.close();
 		return result;
+	}
+
+	public Boolean existFilamento(int id) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		Filamento fil = em.find(Filamento.class, id);
+		if (fil != null) {
+			return true;
+		}
+		return false;
+
+	}
+
+	public Boolean existFilamento(String nome) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		TypedQuery<Filamento> queryFilamenti = em
+				.createQuery(
+						"SELECT p FROM Filamento p WHERE p.nome = " + nome,
+						model.Filamento.class);
+		Filamento result = queryFilamenti.getSingleResult();
+		if(result == null) {
+			return false;
+		}
+		return true;
 	}
 }

@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+import model.Filamento;
 import model.Poscontorno;
 import model.Posscheletro;
 import model.Scheletro;
@@ -60,6 +61,17 @@ public class ControllerScheletro {
 		distanze.add(distMin);
 		distanze.add(distMax);
 		return distanze;
+	}
+	
+	public Boolean existSegmento(int id) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		Scheletro scheletro = em.find(Scheletro.class, id);
+		if (scheletro != null) {
+			return true;
+		}
+		return false;
+
 	}
 	
 	
