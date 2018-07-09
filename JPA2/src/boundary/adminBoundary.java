@@ -987,6 +987,7 @@ public class adminBoundary implements Initializable {
 
 	@FXML // Aggiungi uno strumento
 	public void onStrumentoAdd(ActionEvent event) {
+		ControllerSatellite controller = new ControllerSatellite();
 		if (nomeStrumento.getText().equals("") || nomeSatelliteAppartenenza.getText().equals("")
 				|| bandeStrumento.getText().equals("")) {
 			// input non valido
@@ -1003,7 +1004,7 @@ public class adminBoundary implements Initializable {
 			nomeStrumento.setText("");
 			nomeSatelliteAppartenenza.setText("");
 			bandeStrumento.setText("");
-		} else if (StrumentoDAO.existStrumento(nomeStrumento.getText(), nomeSatelliteAppartenenza.getText())) {
+		} else if (controller.existStrumento(nomeStrumento.getText(), nomeSatelliteAppartenenza.getText())) {
 			// Strumento già esistente
 			errorLabelStrumento.setText("Strumento già esistente");
 			Timeline fiveSecondsWonder = new Timeline(
@@ -1018,7 +1019,7 @@ public class adminBoundary implements Initializable {
 			nomeStrumento.setText("");
 			nomeSatelliteAppartenenza.setText("");
 			bandeStrumento.setText("");
-		} else if (!SatelliteDAO.existSatellite(nomeSatelliteAppartenenza.getText())) {
+		} else if (!controller.existSatellite(nomeSatelliteAppartenenza.getText())) {
 			errorLabelStrumento.setText("Satellite non esistente");
 			Timeline fiveSecondsWonder = new Timeline(
 					new KeyFrame(Duration.seconds(5), new EventHandler<ActionEvent>() {
@@ -1046,9 +1047,9 @@ public class adminBoundary implements Initializable {
 			}
 			if (parse) {
 				// aggiungo
-				StrumentoDAO.insertStrumento(nomeStrumento.getText(), nomeSatelliteAppartenenza.getText());
+				controller.insertStrumento(nomeStrumento.getText(), nomeSatelliteAppartenenza.getText());
 				for (int i = 0; i < bande.size(); i++) {
-					StrumentoDAO.insertBanda(bande.get(i), nomeStrumento.getText(),
+					controller.insertBanda(bande.get(i), nomeStrumento.getText(),
 							nomeSatelliteAppartenenza.getText());
 				}
 				labelSuccessStrumento.setText("Strumento aggiunto con successo");

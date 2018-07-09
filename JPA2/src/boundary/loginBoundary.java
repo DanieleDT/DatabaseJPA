@@ -24,7 +24,7 @@ import control.LoginController;
 
 public class loginBoundary {
 	LoginController controller = null;
-	
+
 	@FXML
 	private TextField usernameText;
 
@@ -57,50 +57,54 @@ public class loginBoundary {
 		if (usernameText.getText().equals("") || passwordText.getText().equals("")) {
 			setErrorMsg("Username o password vuoti non ammessi");
 			return;
-		} 
-		if(controller == null) {
+		}
+		if (controller == null) {
 			controller = new LoginController();
 		}
 		Utente utente = controller.loadUtente(usernameText.getText());
-		if (utente.getPassword().equals(passwordText.getText())) {
-			if (utente.getTipo()) {
-				currentStage.close();
-				Stage stage = new Stage();
-				URL url;
-				Pane mainPane = null;
-				try {
-					url = new File("src/xfml/Admin.fxml").toURL();
-					mainPane = (Pane) FXMLLoader.load(url);
-				} catch (IOException e) {
-					e.printStackTrace();
+		if (utente != null) {
+			if (utente.getPassword().equals(passwordText.getText())) {
+				if (utente.getTipo()) {
+					currentStage.close();
+					Stage stage = new Stage();
+					URL url;
+					Pane mainPane = null;
+					try {
+						url = new File("src/xfml/Admin.fxml").toURL();
+						mainPane = (Pane) FXMLLoader.load(url);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String css = this.getClass().getResource("/User.css").toExternalForm();
+					Scene scene = new Scene(mainPane);
+					scene.getStylesheets().add(css);
+					stage.setScene(scene);
+					stage.setTitle("Admin Page");
+					stage.setResizable(false);
+					stage.show();
+				} else {
+					currentStage.close();
+					Stage stage = new Stage();
+					URL url;
+					Pane mainPane = null;
+					try {
+						url = new File("src/xfml/User.fxml").toURL();
+						mainPane = (Pane) FXMLLoader.load(url);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String css = this.getClass().getResource("/User.css").toExternalForm();
+					Scene scene = new Scene(mainPane);
+					scene.getStylesheets().add(css);
+					stage.setScene(scene);
+					stage.setTitle("User Page");
+					stage.setResizable(false);
+					stage.show();
 				}
-				String css = this.getClass().getResource("/User.css").toExternalForm();
-				Scene scene = new Scene(mainPane);
-				scene.getStylesheets().add(css);
-				stage.setScene(scene);
-				stage.setTitle("Admin Page");
-				stage.setResizable(false);
-				stage.show();
 			} else {
-				currentStage.close();
-				Stage stage = new Stage();
-				URL url;
-				Pane mainPane = null;
-				try {
-					url = new File("src/xfml/User.fxml").toURL();
-					mainPane = (Pane) FXMLLoader.load(url);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				String css = this.getClass().getResource("/User.css").toExternalForm();
-				Scene scene = new Scene(mainPane);
-				scene.getStylesheets().add(css);
-				stage.setScene(scene);
-				stage.setTitle("User Page");
-				stage.setResizable(false);
-				stage.show();
+				setErrorMsg("Username o password errati");
 			}
-		} else {
+		}else {
 			setErrorMsg("Username o password errati");
 		}
 	}

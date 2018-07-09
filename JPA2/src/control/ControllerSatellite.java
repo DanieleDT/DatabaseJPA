@@ -8,7 +8,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import model.Banda;
 import model.Satellite;
+import model.Strumento;
+import model.StrumentoPK;
 
 public class ControllerSatellite {
 	public void insertSatellite(String nome, String agenzia, LocalDate dataInizio, LocalDate dataFine) {
@@ -37,5 +40,49 @@ public class ControllerSatellite {
 			return false;
 		}
 		return true;
+	}
+	
+	public Boolean existStrumento(String nome, String satellite) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		StrumentoPK pk = new StrumentoPK();
+		pk.setNome(nome);
+		pk.setSatellite(satellite);
+		Strumento strumento = em.find(Strumento.class, pk);
+		if(strumento == null) {
+			return false;
+		}
+		return true;
+	}
+	
+	public void insertBanda( double valore, String nome, String satellite) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		Banda banda = new Banda();
+		StrumentoPK pk = new StrumentoPK();
+		pk.setNome(nome);
+		pk.setSatellite(satellite);
+		Strumento strumento = em.find(Strumento.class, pk);
+		banda.setStrumento(strumento);
+		banda.setValore(valore);
+		
+		em.getTransaction().begin();
+		em.persist(banda);
+		em.getTransaction().commit();
+		em.close();
+	}
+	
+	public void insertStrumento(String nome, String satellite) {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPA");
+		EntityManager em = emf.createEntityManager();
+		Strumento strumento = new Strumento();
+		StrumentoPK pk = new StrumentoPK();
+		pk.setNome(nome);
+		pk.setSatellite(satellite);
+		strumento.setId(pk);
+		em.getTransaction().begin();
+		em.persist(strumento);
+		em.getTransaction().commit();
+		em.close();
 	}
 }
